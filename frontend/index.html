@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeatWeaver AI | Studio</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="glass-container">
+        <div id="auth-section">
+            <h1 class="gradient-text">Hey Music Lover!</h1>
+            <p class="sub-text">Enter your details to access the AI Studio.</p>
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Producer Name" required>
+                <input type="email" id="useremail" placeholder="Your Email" required>
+                <button class="btn-glow">ENTER STUDIO</button>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div id="studio-section">
+            <h2 class="logo-text gradient-text">BeatWeaver AI</h2>
+            <p class="sub-text">Crafting infinite chill vibes with Deep Learning.</p>
+
+            <div class="visualizer-container">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+
+            <button id="generateBtn" class="btn-neon">CREATE THE MAGIC</button>
+            <p id="status" style="margin-top: 15px; font-size: 0.85rem;">Ready to compose...</p>
+
+            <div id="playlist" style="margin-top: 30px; text-align: left; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px;">
+                <p style="font-weight: 800; margin-bottom: 10px; color: #00dbde; font-size: 0.8rem;">🎵 YOUR RECENT VIBES</p>
+                <div id="song-list" style="max-height: 120px; overflow-y: auto;">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
