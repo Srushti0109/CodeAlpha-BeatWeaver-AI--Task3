@@ -10,7 +10,8 @@ import shutil
 
 app = FastAPI()
 
-# --- 1. Enable CORS ---
+# --- 1. Enable CORS (The Bridge) ---
+# This allows your frontend to talk to the Railway backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -50,24 +51,25 @@ async def register_user(data: dict):
         conn.close()
         return {"message": "Success"}
     except sqlite3.IntegrityError:
+        # If user already exists, we still count it as a success for the UI flow
         return {"message": "Success"} 
 
-# --- 4. Generation Route (The Final Stabilized Version) ---
+# --- 4. Generation Route ---
 @app.post("/generate")
 async def generate_music():
     try:
         print("🪄 AI is composing...")
-        # 1. Run the AI generator and wait for it to finish
+        # 1. Run the AI generator
         subprocess.run(["python", "generator/generator.py"], capture_output=True, text=True)
         
         original_midi = os.path.join("output", "generated_lofi.mid")
         temp_midi = os.path.join("output", "temp_vibe.mid")
         
-        # 2. Give the system 2 seconds to finish writing the file
+        # 2. Safety delay for file writing
         time.sleep(2) 
         
         if os.path.exists(original_midi):
-            # 3. Create a static copy so the download doesn't crash
+            # 3. Create a static copy for the download
             shutil.copy2(original_midi, temp_midi)
             
             print(f"✅ Vibe stabilized. Sending to browser...")
@@ -83,6 +85,5 @@ async def generate_music():
         print(f"❌ Server Error: {str(e)}")
         return {"error": str(e)}
 
-if __name__ == "__main__":
-    # This matches your terminal command
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+# Note: We removed the uvicorn.run block here because Railway 
+# uses the 'Procfile' to start the server properly in the cloud.
