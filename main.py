@@ -11,7 +11,6 @@ import shutil
 app = FastAPI()
 
 # --- 1. Enable CORS (The Bridge) ---
-# This allows your frontend to talk to the Railway backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -51,7 +50,6 @@ async def register_user(data: dict):
         conn.close()
         return {"message": "Success"}
     except sqlite3.IntegrityError:
-        # If user already exists, we still count it as a success for the UI flow
         return {"message": "Success"} 
 
 # --- 4. Generation Route ---
@@ -59,19 +57,15 @@ async def register_user(data: dict):
 async def generate_music():
     try:
         print("🪄 AI is composing...")
-        # 1. Run the AI generator
         subprocess.run(["python", "generator/generator.py"], capture_output=True, text=True)
         
         original_midi = os.path.join("output", "generated_lofi.mid")
         temp_midi = os.path.join("output", "temp_vibe.mid")
         
-        # 2. Safety delay for file writing
         time.sleep(2) 
         
         if os.path.exists(original_midi):
-            # 3. Create a static copy for the download
             shutil.copy2(original_midi, temp_midi)
-            
             print(f"✅ Vibe stabilized. Sending to browser...")
             return FileResponse(
                 path=temp_midi, 
@@ -85,5 +79,17 @@ async def generate_music():
         print(f"❌ Server Error: {str(e)}")
         return {"error": str(e)}
 
-# Note: We removed the uvicorn.run block here because Railway 
-# uses the 'Procfile' to start the server properly in the cloud.
+# --- 5. Secret Admin Route (What's New) ---
+# Visit this URL in your browser to see your users!
+@app.get("/view-users-list")
+async def view_users():
+    try:
+        conn = sqlite3.connect('users.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users")
+        users = cursor.fetchall()
+        conn.close()
+        # Returns the data in a clean JSON format
+        return {"total_users": len(users), "users": users}
+    except Exception as e:
+        return {"error": str(e)}
