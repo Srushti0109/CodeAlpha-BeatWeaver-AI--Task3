@@ -1,3 +1,7 @@
+// --- Global Configuration ---
+// This is the "Bridge" connecting your frontend to your live Railway backend
+const API_URL = "https://codealpha-beatweaver-ai-task3-production.up.railway.app";
+
 // --- 1. Login & Register Logic ---
 document.querySelector('.btn-glow').addEventListener('click', async () => {
     const username = document.getElementById('username').value;
@@ -5,7 +9,8 @@ document.querySelector('.btn-glow').addEventListener('click', async () => {
     
     if (username && email) {
         try {
-            const response = await fetch('http://127.0.0.1:8000/register', {
+            // Using the API_URL variable here
+            const response = await fetch(`${API_URL}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email })
@@ -18,8 +23,13 @@ document.querySelector('.btn-glow').addEventListener('click', async () => {
                 document.getElementById('studio-section').style.display = 'block';
                 document.getElementById('status').innerText = `Welcome, ${username}!`;
             }
-        } catch (e) { alert("Server error! Is main.py running?"); }
-    } else { alert("Fill in both fields!"); }
+        } catch (e) { 
+            alert("Server error! Make sure your Railway backend is 'Active'."); 
+            console.error(e);
+        }
+    } else { 
+        alert("Fill in both fields!"); 
+    }
 });
 
 // --- 2. Generation & Gallery Logic ---
@@ -32,7 +42,8 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     visualizer.classList.add('animating');
 
     try {
-        const response = await fetch('http://127.0.0.1:8000/generate', { method: 'POST' });
+        // Using the API_URL variable here
+        const response = await fetch(`${API_URL}/generate`, { method: 'POST' });
         if (response.ok) {
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
@@ -45,7 +56,14 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
             songList.prepend(item);
 
             status.innerHTML = "✅ Vibe added to your library!";
+        } else {
+            status.innerText = "❌ Server responded with an error.";
         }
-    } catch (e) { status.innerText = "❌ Generation Error."; }
-    finally { visualizer.classList.remove('animating'); }
+    } catch (e) { 
+        status.innerText = "❌ Connection Error. Is the backend URL correct?"; 
+        console.error(e);
+    }
+    finally { 
+        visualizer.classList.remove('animating'); 
+    }
 });
