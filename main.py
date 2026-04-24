@@ -21,7 +21,8 @@ app.add_middleware(
 
 # --- 2. Database Setup ---
 def init_db():
-    conn = sqlite3.connect('users.db')
+    # Added timeout=10 to prevent "database is locked" errors
+    conn = sqlite3.connect('users.db', timeout=10)
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
@@ -43,7 +44,8 @@ async def register_user(data: dict):
     if not username or not email:
         raise HTTPException(status_code=400, detail="Missing fields")
     try:
-        conn = sqlite3.connect('users.db')
+        # Added timeout=10 to handle simultaneous registrations
+        conn = sqlite3.connect('users.db', timeout=10)
         cursor = conn.cursor()
         cursor.execute("INSERT INTO users (username, email) VALUES (?, ?)", (username, email))
         conn.commit()
@@ -51,6 +53,9 @@ async def register_user(data: dict):
         return {"message": "Success"}
     except sqlite3.IntegrityError:
         return {"message": "Success"} 
+    except Exception as e:
+        print(f"❌ DB Error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Database busy")
 
 # --- 4. Generation Route ---
 @app.post("/generate")
@@ -79,17 +84,16 @@ async def generate_music():
         print(f"❌ Server Error: {str(e)}")
         return {"error": str(e)}
 
-# --- 5. Secret Admin Route (What's New) ---
-# Visit this URL in your browser to see your users!
+# --- 5. Secret Admin Route ---
 @app.get("/view-users-list")
 async def view_users():
     try:
-        conn = sqlite3.connect('users.db')
+        # Added timeout=10 so viewing doesn't block registering
+        conn = sqlite3.connect('users.db', timeout=10)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users")
         users = cursor.fetchall()
         conn.close()
-        # Returns the data in a clean JSON format
         return {"total_users": len(users), "users": users}
     except Exception as e:
         return {"error": str(e)}
