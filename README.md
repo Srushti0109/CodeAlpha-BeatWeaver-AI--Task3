@@ -3,7 +3,7 @@ BeatWeaver AI 🎵✨
 Task 3: AI-Driven Music Generation System
 
 Summary of your URLsComponentPublic LinkYour Website (Frontend)https://srushti0109.github.io/CodeAlpha-BeatWeaver-AI--Task3/  
-Your Database (Secret View)https://codealpha-beatweaver-ai-task3-production.up.railway.app/view-users-list
+
 Your API Docs (Swagger)https://codealpha-beatweaver-ai-task3-production.up.railway.app/docs
 
 📌 Project Overview
